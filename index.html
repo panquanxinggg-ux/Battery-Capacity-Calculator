@@ -49,7 +49,7 @@
     }
     /* ===== 图片样式结束 ===== */
 
-    /* ===== 输出端口区域（始终显示） ===== */
+    /* ===== 输出报警电流区域 ===== */
     .panel-outputs {
       background: #e8f2fa;
       border-radius: 16px;
@@ -67,14 +67,6 @@
       color: #1f4b6e;
       white-space: nowrap;
     }
-    .panel-outputs .output-value {
-      color: #003057;
-      font-weight: 700;
-      background: white;
-      padding: 2px 18px;
-      border-radius: 40px;
-      font-size: 0.95rem;
-    }
     .panel-outputs .output-current {
       color: #003057;
       font-weight: 700;
@@ -89,35 +81,46 @@
     .panel-outputs .output-input-group {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       background: white;
-      padding: 2px 12px 2px 6px;
+      padding: 2px 10px 2px 8px;
       border-radius: 40px;
       border: 1px solid #bfd3e8;
     }
     .panel-outputs .output-input-group label {
       font-size: 0.8rem;
       color: #1f4b6e;
-      font-weight: 500;
+      font-weight: 600;
+      white-space: nowrap;
     }
     .panel-outputs .output-input-group input {
-      width: 55px;
-      padding: 4px 6px;
+      width: 60px;
+      padding: 4px 4px;
       border: none;
       border-radius: 30px;
       text-align: center;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       background: transparent;
       outline: none;
       color: #003057;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    .panel-outputs .output-input-group input::-webkit-outer-spin-button,
+    .panel-outputs .output-input-group input::-webkit-inner-spin-button {
+      -webkit-appearance: spinner-button;
+      appearance: spinner-button;
+      opacity: 1;
     }
     .panel-outputs .output-input-group input:focus {
       background: #f0f6ff;
+      border-radius: 30px;
     }
     .panel-outputs .output-input-group .unit {
       font-size: 0.75rem;
       color: #5f7f9f;
+      font-weight: 400;
     }
     .panel-outputs .output-row {
       display: flex;
@@ -126,7 +129,7 @@
       gap: 8px 20px;
       width: 100%;
     }
-    /* ===== 输出端口区域结束 ===== */
+    /* ===== 输出报警电流区域结束 ===== */
 
     .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 40px; margin: 18px 0 10px; }
     .input-group { display: flex; flex-direction: column; gap: 4px; }
@@ -151,11 +154,10 @@
     .hidden-col-toggle button:hover { background: #c0d5ea; }
     .hidden-col-toggle input { padding: 6px 14px; border-radius: 40px; border: 1px solid #bccddc; width: 140px; }
     .hidden-col-toggle .hint { font-size: 0.8rem; color: #3f6485; }
-    /* 默认隐藏列 - 使用 !important 确保优先级 */
+    /* 默认隐藏列 - 不使用 !important，通过内联样式控制 */
     .hidden-col { 
-      display: none !important; 
+      display: none; 
     }
-    /* 当显示时，通过内联样式覆盖 */
     .print-btn, .reset-btn { border: none; padding: 8px 22px; border-radius: 60px; font-weight: 600; cursor: pointer; transition: 0.15s; margin-left: 8px; }
     .print-btn { background: #1f4b6e; color: white; }
     .print-btn:hover { background: #0f3755; box-shadow: 0 4px 10px rgba(0,20,40,0.2); }
@@ -225,12 +227,8 @@
     <div class="panel-preview" id="panelPreview"><img id="panelImage" src="" alt="面板图片" style="display:none;"><span id="panelNameLabel">SEC3008</span></div>
   </div>
 
-  <!-- ===== 输出端口（始终显示，可输入电流） ===== -->
+  <!-- ===== 输出报警电流 ===== -->
   <div class="panel-outputs" id="panelOutputsArea">
-    <div class="output-row">
-      <span class="output-label" data-i18n="outputs">🔌 输出端口：</span>
-      <span class="output-value" id="panelOutputs">S.C.OUT1 + S.C.OUT2, FIRE.OUT</span>
-    </div>
     <div class="output-row" id="outputCurrentInputsRow">
       <span class="output-label" data-i18n="outputCurrent">⚡ 输出报警电流 (A)：</span>
       <span id="outputCurrentInputs"></span>
@@ -238,7 +236,7 @@
       <span class="output-current" id="outputTotalCurrent">0.000 A</span>
     </div>
   </div>
-  <!-- ===== 输出端口结束 ===== -->
+  <!-- ===== 输出报警电流结束 ===== -->
 
   <!-- 时间 -->
   <div class="grid-2col">
@@ -318,7 +316,6 @@
     SEC3004: { outputs: ['S.C.OUT1', 'S.C.OUT2', 'FIRE.OUT'] },
     SEC3008: { outputs: ['S.C.OUT1', 'S.C.OUT2', 'FIRE.OUT'] }
   };
-  // ===== 面板输出端口映射结束 =====
 
   // ===== 图片配置 =====
   const PANEL_IMAGES = {
@@ -327,7 +324,6 @@
     SEC3004: 'SEC3004.png',
     SEC3008: 'SEC3008.png'
   };
-  // ===== 图片配置结束 =====
 
   // ----- DOM -----
   const panelSelect = document.getElementById('panelSelect');
@@ -340,7 +336,6 @@
   const totalAlarmCurrent = document.getElementById('totalAlarmCurrent');
   const panelImage = document.getElementById('panelImage');
   const panelNameLabel = document.getElementById('panelNameLabel');
-  const panelOutputs = document.getElementById('panelOutputs');
   const outputCurrentInputs = document.getElementById('outputCurrentInputs');
   const outputTotalCurrent = document.getElementById('outputTotalCurrent');
   const projectNameInput = document.getElementById('projectNameInput');
@@ -355,6 +350,36 @@
   const PANEL_MAP = { SEC1000: { quiescent: 0.15 }, SEC3002: { quiescent: 0.25 }, SEC3004: { quiescent: 0.30 }, SEC3008: { quiescent: 0.30 } };
 
   projectDateInput.value = new Date().toISOString().split('T')[0];
+
+  // ============================================================
+  // ★★★ 隐藏列操作函数（核心修复） ★★★
+  // ============================================================
+  function applyHiddenColumns(show) {
+    hiddenVisible = show;
+    const hiddenCols = document.querySelectorAll('.hidden-col');
+    if (show) {
+      // 显示：移除 display:none，让表格正常显示
+      hiddenCols.forEach(el => {
+        el.style.display = '';
+      });
+      toggleHiddenBtn.textContent = '隐藏';
+    } else {
+      // 隐藏：强制隐藏
+      hiddenCols.forEach(el => {
+        el.style.display = 'none';
+      });
+      toggleHiddenBtn.textContent = '显示';
+    }
+  }
+
+  // 初始化隐藏列（强制隐藏）
+  function initHiddenColumns() {
+    document.querySelectorAll('.hidden-col').forEach(el => {
+      el.style.display = 'none';
+    });
+    hiddenVisible = false;
+    toggleHiddenBtn.textContent = '显示';
+  }
 
   function updatePanelInfo(panelModel) {
     // 更新图片
@@ -371,11 +396,8 @@
     }
     panelNameLabel.textContent = panelModel;
 
-    // 更新输出端口名称
-    const outputInfo = PANEL_OUTPUTS[panelModel] || PANEL_OUTPUTS.SEC3008;
-    panelOutputs.textContent = outputInfo.outputs.join(' + ');
-
     // 重新生成输出电流输入框
+    const outputInfo = PANEL_OUTPUTS[panelModel] || PANEL_OUTPUTS.SEC3008;
     renderOutputInputs(outputInfo.outputs);
   }
 
@@ -383,38 +405,62 @@
   function renderOutputInputs(outputNames) {
     outputCurrentInputs.innerHTML = '';
     outputInputs = [];
-    outputNames.forEach((name, idx) => {
-      const group = document.createElement('span');
-      group.className = 'output-input-group';
-      const label = document.createElement('label');
-      label.textContent = name + ':';
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.min = 0;
-      input.step = 0.001;
-      input.value = 0;
-      input.dataset.idx = idx;
-      input.className = 'output-current-input';
-      const unit = document.createElement('span');
-      unit.className = 'unit';
-      unit.textContent = 'A';
-      group.appendChild(label);
-      group.appendChild(input);
-      group.appendChild(unit);
-      outputCurrentInputs.appendChild(group);
-      outputInputs.push(input);
-
-      input.addEventListener('input', function() {
-        updateOutputTotal();
-        computeAll();
-      });
-    });
+    
     if (outputNames.length === 0) {
       const span = document.createElement('span');
       span.textContent = '—';
       span.style.color = '#8fafcf';
       outputCurrentInputs.appendChild(span);
+      return;
     }
+
+    outputNames.forEach((name, idx) => {
+      const group = document.createElement('span');
+      group.className = 'output-input-group';
+      
+      const label = document.createElement('label');
+      label.textContent = name + ':';
+      
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = 0.001;
+      input.step = 0.001;
+      input.value = '0.000';
+      input.dataset.idx = idx;
+      input.className = 'output-current-input';
+      
+      input.addEventListener('input', function() {
+        const val = parseFloat(this.value);
+        if (!isNaN(val) && val >= 0) {
+          updateOutputTotal();
+          computeAll();
+        } else if (this.value === '' || this.value === '-') {
+          updateOutputTotal();
+        }
+      });
+      
+      input.addEventListener('blur', function() {
+        let val = parseFloat(this.value);
+        if (isNaN(val) || val < 0) {
+          this.value = '0.000';
+        } else {
+          this.value = val.toFixed(3);
+        }
+        updateOutputTotal();
+        computeAll();
+      });
+      
+      const unit = document.createElement('span');
+      unit.className = 'unit';
+      unit.textContent = 'A';
+      
+      group.appendChild(label);
+      group.appendChild(input);
+      group.appendChild(unit);
+      outputCurrentInputs.appendChild(group);
+      outputInputs.push(input);
+    });
+    
     updateOutputTotal();
   }
 
@@ -423,17 +469,17 @@
     let total = 0;
     outputInputs.forEach(inp => {
       const val = parseFloat(inp.value) || 0;
-      total += val;
+      if (val >= 0) total += val;
     });
     outputTotalCurrent.textContent = total.toFixed(3) + ' A';
     return total;
   }
 
-  // ----- 获取输出电流总和 -----
   function getOutputTotal() {
     let total = 0;
     outputInputs.forEach(inp => {
-      total += parseFloat(inp.value) || 0;
+      const val = parseFloat(inp.value) || 0;
+      if (val >= 0) total += val;
     });
     return total;
   }
@@ -480,7 +526,17 @@
     const panel = panelSelect.value;
     const panelQuiescent = PANEL_MAP[panel]?.quiescent || 0.30;
     quiescentDisplay.textContent = panelQuiescent.toFixed(2);
+    
+    // 保存当前输出值
+    const currentOutputValues = outputInputs.map(inp => inp.value);
     updatePanelInfo(panel);
+    // 恢复输出值
+    outputInputs.forEach((inp, idx) => {
+      if (idx < currentOutputValues.length) {
+        inp.value = currentOutputValues[idx] || '0.000';
+      }
+    });
+    
     const qtyVals = qtyInputs.map(inp => parseFloat(inp.value) || 0);
     const activeVals = activeInputs.map(inp => parseFloat(inp.value) || 0);
     let totalLoopQ = 0, totalLoopA = 0, totalModQ = 0, totalModA = 0;
@@ -501,27 +557,9 @@
     const standbyH = parseFloat(standbyInput.value) || 0, alarmH = parseFloat(alarmInput.value) || 0;
     const rawAh = (standbyH * totalQuiescent) + (alarmH * totalAlarm);
     batteryAh.textContent = (Math.ceil(1.25 * rawAh * 10) / 10).toFixed(1);
-  }
-
-  // ============================================================
-  // ★★★ 修复：隐藏列切换功能 ★★★
-  // ============================================================
-  function toggleHiddenColumns(show) {
-    hiddenVisible = show;
-    const hiddenCols = document.querySelectorAll('.hidden-col');
-    if (show) {
-      // 显示：移除内联样式，让表格正常显示
-      hiddenCols.forEach(el => {
-        el.style.display = 'table-cell';
-      });
-      toggleHiddenBtn.textContent = '隐藏';
-    } else {
-      // 隐藏：强制隐藏
-      hiddenCols.forEach(el => {
-        el.style.display = 'none';
-      });
-      toggleHiddenBtn.textContent = '显示';
-    }
+    
+    // ★★★ 在每次计算后，重新应用隐藏列状态 ★★★
+    applyHiddenColumns(hiddenVisible);
   }
 
   // ----- 复位 -----
@@ -529,7 +567,7 @@
     if (confirm('复位后，所有数据清理！是否继续？')) {
       qtyInputs.forEach(inp => inp.value = 0);
       activeInputs.forEach(inp => inp.value = 0);
-      outputInputs.forEach(inp => inp.value = 0);
+      outputInputs.forEach(inp => inp.value = '0.000');
       standbyInput.value = 8;
       alarmInput.value = 0.5;
       updateOutputTotal();
@@ -539,12 +577,12 @@
 
   // ----- i18n -----
   const i18n = {
-    zh: { title: '🔋 电池容量计算器', panelModel: '📟 面板型号', quiescentLabel: '静态电流 (A):', standbyTime: '⏱️ 待机时间 (h)', alarmTime: '🚨 报警时间 (h)', deviceConfig: '⚙️ 系统设备配置', model: '型号', qty: '产品数量', activeQty: '报警激活数', loopQc: '回路静态 (A)', sumLoopQc: 'Σ 回路静态', loopAc: '回路报警 (A)', sumLoopAc: 'Σ 回路报警', modQc: '模块/声光静态 (A)', sumModQc: 'Σ 24V静态', modAc: '24V报警 (A)', sumModAc: 'Σ 24V报警', batteryCapacity: '🔋 电池容量 (24V)', totalQuiescent: '待机总电流', totalAlarm: '报警总电流', noteGreen: '📝 请在表格中填写实际工程产品数量 / 报警激活数', footer: '基于 SANJIAN Standby battery calculator V1.3 · 实时计算', hideHint: '🔒 隐藏列 (密码查看)', showBtn: '显示', projectName: '📋 项目名称', date: '📅 日期', printBtn: '🖨️ 打印报表', resetBtn: '🔄 复位', outputs: '🔌 输出端口', outputCurrent: '⚡ 输出报警电流 (A)' },
-    en: { title: '🔋 Battery Capacity Calculator', panelModel: '📟 Panel Model', quiescentLabel: 'Quiescent (A):', standbyTime: '⏱️ Standby (h)', alarmTime: '🚨 Alarm (h)', deviceConfig: '⚙️ System Device Config', model: 'Model', qty: 'Qty', activeQty: 'Active Qty', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarm (A)', sumLoopAc: 'Σ Loop Alarm', modQc: 'Mod/Sounder Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Battery Cap. (24V)', totalQuiescent: 'Total Q', totalAlarm: 'Total Alarm', noteGreen: '📝 Fill actual project Qty / Active', footer: 'Based on SANJIAN Standby battery calculator V1.3 · Real-time', hideHint: '🔒 Hidden cols (pwd view)', showBtn: 'Show', projectName: '📋 Project Name', date: '📅 Date', printBtn: '🖨️ Print Report', resetBtn: '🔄 Reset', outputs: '🔌 Output Ports', outputCurrent: '⚡ Output Alarm Current (A)' },
-    pt: { title: '🔋 Calculadora de Bateria', panelModel: '📟 Modelo do Painel', quiescentLabel: 'Corrente quiescente (A):', standbyTime: '⏱️ Espera (h)', alarmTime: '🚨 Alarme (h)', deviceConfig: '⚙️ Config. Dispositivos', model: 'Modelo', qty: 'Qtd', activeQty: 'Ativados', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarme (A)', sumLoopAc: 'Σ Loop Alarme', modQc: 'Mód/Son Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarme (A)', sumModAc: 'Σ 24V Alarme', batteryCapacity: '🔋 Capacidade (24V)', totalQuiescent: 'Q total', totalAlarm: 'Alarme total', noteGreen: '📝 Preencha Qtd / Ativados reais', footer: 'Baseado em SANJIAN Standby battery calculator V1.3 · Tempo real', hideHint: '🔒 Colunas ocultas (senha)', showBtn: 'Mostrar', projectName: '📋 Nome do Projeto', date: '📅 Data', printBtn: '🖨️ Imprimir', resetBtn: '🔄 Redefinir', outputs: '🔌 Portas de Saída', outputCurrent: '⚡ Corrente de Alarme de Saída (A)' },
-    ru: { title: '🔋 Калькулятор батареи', panelModel: '📟 Модель панели', quiescentLabel: 'Ток покоя (A):', standbyTime: '⏱️ Резерв (ч)', alarmTime: '🚨 Тревога (ч)', deviceConfig: '⚙️ Конфигурация устройств', model: 'Модель', qty: 'Кол-во', activeQty: 'Актив. тревога', loopQc: 'Петля Q (A)', sumLoopQc: 'Σ Петля Q', loopAc: 'Петля тревога (A)', sumLoopAc: 'Σ Петля тревога', modQc: 'Мод/звук Q (A)', sumModQc: 'Σ 24В Q', modAc: '24В тревога (A)', sumModAc: 'Σ 24В тревога', batteryCapacity: '🔋 Ёмкость (24В)', totalQuiescent: 'Общий ток покоя', totalAlarm: 'Общий ток тревоги', noteGreen: '📝 Заполните фактические значения (Кол-во / Актив.)', footer: 'На основе SANJIAN Standby battery calculator V1.3 · реальное время', hideHint: '🔒 Скрытые колонки (пароль)', showBtn: 'Показать', projectName: '📋 Название проекта', date: '📅 Дата', printBtn: '🖨️ Печать', resetBtn: '🔄 Сброс', outputs: '🔌 Выходные порты', outputCurrent: '⚡ Выходной ток тревоги (A)' },
-    tr: { title: '🔋 Batarya Kapasite Hesaplayıcı', panelModel: '📟 Panel Modeli', quiescentLabel: 'Sakin akım (A):', standbyTime: '⏱️ Bekleme (s)', alarmTime: '🚨 Alarm (s)', deviceConfig: '⚙️ Sistem Cihazları', model: 'Model', qty: 'Adet', activeQty: 'Aktif Alarm', loopQc: 'Döngü Q (A)', sumLoopQc: 'Σ Döngü Q', loopAc: 'Döngü Alarm (A)', sumLoopAc: 'Σ Döngü Alarm', modQc: 'Mod/Ses Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Kapasite (24V)', totalQuiescent: 'Toplam Sakin', totalAlarm: 'Toplam Alarm', noteGreen: '📝 Gerçek değerleri girin (Adet / Aktif)', footer: 'SANJIAN Standby battery calculator V1.3 · Gerçek zamanlı', hideHint: '🔒 Gizli sütunlar (şifre)', showBtn: 'Göster', projectName: '📋 Proje Adı', date: '📅 Tarih', printBtn: '🖨️ Yazdır', resetBtn: '🔄 Sıfırla', outputs: '🔌 Çıkış Portları', outputCurrent: '⚡ Çıkış Alarm Akımı (A)' },
-    ar: { title: '🔋 حاسبة سعة البطارية', panelModel: '📟 طراز اللوحة', quiescentLabel: 'تيار السكون (أ):', standbyTime: '⏱️ وقت الاستعداد (س)', alarmTime: '🚨 وقت الإنذار (س)', deviceConfig: '⚙️ تكوين الأجهزة', model: 'الطراز', qty: 'الكمية', activeQty: 'عدد الإنذار', loopQc: 'تيار الحلقة (أ)', sumLoopQc: 'Σ تيار الحلقة', loopAc: 'إنذار الحلقة (أ)', sumLoopAc: 'Σ إنذار الحلقة', modQc: 'تيار الوحدة (أ)', sumModQc: 'Σ 24V تيار', modAc: 'إنذار 24V (أ)', sumModAc: 'Σ إنذار 24V', batteryCapacity: '🔋 السعة (24 فولت)', totalQuiescent: 'إجمالي السكون', totalAlarm: 'إجمالي الإنذار', noteGreen: '📝 أدخل القيم الفعلية (الكمية / النشط)', footer: 'استنادًا إلى SANJIAN Standby battery calculator V1.3 · فوري', hideHint: '🔒 أعمدة مخفية (كلمة مرور)', showBtn: 'عرض', projectName: '📋 اسم المشروع', date: '📅 التاريخ', printBtn: '🖨️ طباعة', resetBtn: '🔄 إعادة تعيين', outputs: '🔌 منافذ الإخراج', outputCurrent: '⚡ تيار إنذار الإخراج (أ)' }
+    zh: { title: '🔋 电池容量计算器', panelModel: '📟 面板型号', quiescentLabel: '静态电流 (A):', standbyTime: '⏱️ 待机时间 (h)', alarmTime: '🚨 报警时间 (h)', deviceConfig: '⚙️ 系统设备配置', model: '型号', qty: '产品数量', activeQty: '报警激活数', loopQc: '回路静态 (A)', sumLoopQc: 'Σ 回路静态', loopAc: '回路报警 (A)', sumLoopAc: 'Σ 回路报警', modQc: '模块/声光静态 (A)', sumModQc: 'Σ 24V静态', modAc: '24V报警 (A)', sumModAc: 'Σ 24V报警', batteryCapacity: '🔋 电池容量 (24V)', totalQuiescent: '待机总电流', totalAlarm: '报警总电流', noteGreen: '📝 请在表格中填写实际工程产品数量 / 报警激活数', footer: '基于 SANJIAN Standby battery calculator V1.3 · 实时计算', hideHint: '🔒 隐藏列 (密码查看)', showBtn: '显示', projectName: '📋 项目名称', date: '📅 日期', printBtn: '🖨️ 打印报表', resetBtn: '🔄 复位', outputCurrent: '⚡ 输出报警电流 (A)' },
+    en: { title: '🔋 Battery Capacity Calculator', panelModel: '📟 Panel Model', quiescentLabel: 'Quiescent (A):', standbyTime: '⏱️ Standby (h)', alarmTime: '🚨 Alarm (h)', deviceConfig: '⚙️ System Device Config', model: 'Model', qty: 'Qty', activeQty: 'Active Qty', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarm (A)', sumLoopAc: 'Σ Loop Alarm', modQc: 'Mod/Sounder Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Battery Cap. (24V)', totalQuiescent: 'Total Q', totalAlarm: 'Total Alarm', noteGreen: '📝 Fill actual project Qty / Active', footer: 'Based on SANJIAN Standby battery calculator V1.3 · Real-time', hideHint: '🔒 Hidden cols (pwd view)', showBtn: 'Show', projectName: '📋 Project Name', date: '📅 Date', printBtn: '🖨️ Print Report', resetBtn: '🔄 Reset', outputCurrent: '⚡ Output Alarm Current (A)' },
+    pt: { title: '🔋 Calculadora de Bateria', panelModel: '📟 Modelo do Painel', quiescentLabel: 'Corrente quiescente (A):', standbyTime: '⏱️ Espera (h)', alarmTime: '🚨 Alarme (h)', deviceConfig: '⚙️ Config. Dispositivos', model: 'Modelo', qty: 'Qtd', activeQty: 'Ativados', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarme (A)', sumLoopAc: 'Σ Loop Alarme', modQc: 'Mód/Son Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarme (A)', sumModAc: 'Σ 24V Alarme', batteryCapacity: '🔋 Capacidade (24V)', totalQuiescent: 'Q total', totalAlarm: 'Alarme total', noteGreen: '📝 Preencha Qtd / Ativados reais', footer: 'Baseado em SANJIAN Standby battery calculator V1.3 · Tempo real', hideHint: '🔒 Colunas ocultas (senha)', showBtn: 'Mostrar', projectName: '📋 Nome do Projeto', date: '📅 Data', printBtn: '🖨️ Imprimir', resetBtn: '🔄 Redefinir', outputCurrent: '⚡ Corrente de Alarme de Saída (A)' },
+    ru: { title: '🔋 Калькулятор батареи', panelModel: '📟 Модель панели', quiescentLabel: 'Ток покоя (A):', standbyTime: '⏱️ Резерв (ч)', alarmTime: '🚨 Тревога (ч)', deviceConfig: '⚙️ Конфигурация устройств', model: 'Модель', qty: 'Кол-во', activeQty: 'Актив. тревога', loopQc: 'Петля Q (A)', sumLoopQc: 'Σ Петля Q', loopAc: 'Петля тревога (A)', sumLoopAc: 'Σ Петля тревога', modQc: 'Мод/звук Q (A)', sumModQc: 'Σ 24В Q', modAc: '24В тревога (A)', sumModAc: 'Σ 24В тревога', batteryCapacity: '🔋 Ёмкость (24В)', totalQuiescent: 'Общий ток покоя', totalAlarm: 'Общий ток тревоги', noteGreen: '📝 Заполните фактические значения (Кол-во / Актив.)', footer: 'На основе SANJIAN Standby battery calculator V1.3 · реальное время', hideHint: '🔒 Скрытые колонки (пароль)', showBtn: 'Показать', projectName: '📋 Название проекта', date: '📅 Дата', printBtn: '🖨️ Печать', resetBtn: '🔄 Сброс', outputCurrent: '⚡ Выходной ток тревоги (A)' },
+    tr: { title: '🔋 Batarya Kapasite Hesaplayıcı', panelModel: '📟 Panel Modeli', quiescentLabel: 'Sakin akım (A):', standbyTime: '⏱️ Bekleme (s)', alarmTime: '🚨 Alarm (s)', deviceConfig: '⚙️ Sistem Cihazları', model: 'Model', qty: 'Adet', activeQty: 'Aktif Alarm', loopQc: 'Döngü Q (A)', sumLoopQc: 'Σ Döngü Q', loopAc: 'Döngü Alarm (A)', sumLoopAc: 'Σ Döngü Alarm', modQc: 'Mod/Ses Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Kapasite (24V)', totalQuiescent: 'Toplam Sakin', totalAlarm: 'Toplam Alarm', noteGreen: '📝 Gerçek değerleri girin (Adet / Aktif)', footer: 'SANJIAN Standby battery calculator V1.3 · Gerçek zamanlı', hideHint: '🔒 Gizli sütunlar (şifre)', showBtn: 'Göster', projectName: '📋 Proje Adı', date: '📅 Tarih', printBtn: '🖨️ Yazdır', resetBtn: '🔄 Sıfırla', outputCurrent: '⚡ Çıkış Alarm Akımı (A)' },
+    ar: { title: '🔋 حاسبة سعة البطارية', panelModel: '📟 طراز اللوحة', quiescentLabel: 'تيار السكون (أ):', standbyTime: '⏱️ وقت الاستعداد (س)', alarmTime: '🚨 وقت الإنذار (س)', deviceConfig: '⚙️ تكوين الأجهزة', model: 'الطراز', qty: 'الكمية', activeQty: 'عدد الإنذار', loopQc: 'تيار الحلقة (أ)', sumLoopQc: 'Σ تيار الحلقة', loopAc: 'إنذار الحلقة (أ)', sumLoopAc: 'Σ إنذار الحلقة', modQc: 'تيار الوحدة (أ)', sumModQc: 'Σ 24V تيار', modAc: 'إنذار 24V (أ)', sumModAc: 'Σ إنذار 24V', batteryCapacity: '🔋 السعة (24 فولت)', totalQuiescent: 'إجمالي السكون', totalAlarm: 'إجمالي الإنذار', noteGreen: '📝 أدخل القيم الفعلية (الكمية / النشط)', footer: 'استنادًا إلى SANJIAN Standby battery calculator V1.3 · فوري', hideHint: '🔒 أعمدة مخفية (كلمة مرور)', showBtn: 'عرض', projectName: '📋 اسم المشروع', date: '📅 التاريخ', printBtn: '🖨️ طباعة', resetBtn: '🔄 إعادة تعيين', outputCurrent: '⚡ تيار إنذار الإخراج (أ)' }
   };
 
   let currentLang = 'zh';
@@ -560,7 +598,7 @@
 
   // ----- 事件绑定 -----
   panelSelect.addEventListener('change', function() {
-    outputInputs.forEach(inp => inp.value = 0);
+    outputInputs.forEach(inp => inp.value = '0.000');
     updateOutputTotal();
     computeAll();
   });
@@ -571,15 +609,13 @@
   // ----- 隐藏列按钮事件 -----
   toggleHiddenBtn.addEventListener('click', function() {
     if (hiddenVisible) {
-      // 如果当前是显示状态，点击后隐藏
-      toggleHiddenColumns(false);
+      applyHiddenColumns(false);
       hiddenPwdInput.value = '';
       return;
     }
-    // 当前是隐藏状态，验证密码
     const pwd = hiddenPwdInput.value;
     if (pwd === VIEW_PASSWORD) {
-      toggleHiddenColumns(true);
+      applyHiddenColumns(true);
       hiddenPwdInput.value = '';
     } else {
       alert('密码错误！');
@@ -592,16 +628,9 @@
   // ============================================================
   // ★★★ 初始化 ★★★
   // ============================================================
-  // 1. 先确保所有隐藏列是隐藏状态
-  document.querySelectorAll('.hidden-col').forEach(el => {
-    el.style.display = 'none';
-  });
-  hiddenVisible = false;
-  toggleHiddenBtn.textContent = '显示';
-
-  // 2. 渲染表格和数据
   renderTable();
   applyLanguage('zh');
+  initHiddenColumns();  // 初始化隐藏列
   updatePanelInfo(panelSelect.value);
   computeAll();
   window.recompute = computeAll;
