@@ -1,2 +1,3 @@
 #for test
-release
+# Sanjiang-Battery-Capacity-Calculator
+Sanjiang Battery Capacity Calculator-
