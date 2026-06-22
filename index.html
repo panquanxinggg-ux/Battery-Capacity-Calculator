@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>控制器电池容量计算器 · 多语言</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+    body { background: #f0f4f8; margin: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .calculator { max-width: 1280px; width: 100%; background: white; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,20,40,0.15); padding: 24px 28px 36px; transition: 0.2s; }
+    .project-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; background: #f2f8ff; border-radius: 20px; padding: 12px 20px; margin-bottom: 16px; border: 1px solid #dbe5ef; }
+    .project-header .project-item { display: flex; align-items: center; gap: 8px; font-weight: 500; color: #1f3d57; }
+    .project-header input { padding: 6px 14px; border-radius: 40px; border: 1px solid #bccddc; background: white; font-size: 0.95rem; width: 160px; }
+    .project-header input:focus { border-color: #1f4b6e; outline: none; box-shadow: 0 0 0 3px rgba(31,75,110,0.12); }
+    .h1-title { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 0 0 8px 0; font-weight: 500; font-size: 1.9rem; color: #0b2a3e; border-bottom: 2px solid #e6edf4; padding-bottom: 12px; }
+    .lang-bar { display: flex; gap: 8px; flex-wrap: wrap; background: #f2f6fc; padding: 6px 14px; border-radius: 60px; }
+    .lang-btn { background: transparent; border: none; padding: 6px 14px; border-radius: 40px; font-weight: 500; font-size: 0.9rem; color: #1f4b6e; cursor: pointer; transition: 0.15s; }
+    .lang-btn:hover { background: #d0e0ef; }
+    .lang-btn.active { background: #1f4b6e; color: white; box-shadow: 0 2px 8px rgba(0,40,70,0.2); }
+    .panel-selector { background: #f7faff; border-radius: 20px; padding: 16px 20px; margin: 16px 0 20px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px; border: 1px solid #dbe5ef; }
+    .panel-selector label { font-weight: 500; color: #1f3d57; display: flex; align-items: center; gap: 12px; }
+    .panel-selector select { padding: 10px 22px 10px 16px; border-radius: 40px; border: 1px solid #bccddc; background: white; font-weight: 500; font-size: 1rem; color: #0b2a3e; cursor: pointer; outline: none; }
+    .panel-selector select:focus { border-color: #1f4b6e; box-shadow: 0 0 0 3px rgba(31,75,110,0.15); }
+    .panel-preview { display: flex; align-items: center; gap: 12px; margin-left: auto; background: #eef5fc; padding: 4px 18px 4px 12px; border-radius: 60px; border: 1px solid #c7d9ed; }
+    .panel-preview img { max-height: 48px; max-width: 80px; object-fit: contain; border-radius: 8px; background: white; padding: 4px; }
+    .panel-preview span { font-weight: 500; color: #1f4b6e; }
+    .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 40px; margin: 18px 0 10px; }
+    .input-group { display: flex; flex-direction: column; gap: 4px; }
+    .input-group label { font-weight: 500; color: #1e3d57; font-size: 0.95rem; }
+    .input-group input { padding: 12px 16px; border: 1px solid #ccdcec; border-radius: 40px; font-size: 1rem; background: white; transition: 0.1s; width: 100%; max-width: 200px; }
+    .input-group input:focus { border-color: #1f6b9e; box-shadow: 0 0 0 3px rgba(31,107,158,0.15); outline: none; }
+    .device-table { margin: 28px 0 16px; overflow-x: auto; border-radius: 18px; border: 1px solid #dce6f0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
+    th { background: #e4eef9; color: #10344d; font-weight: 600; padding: 12px 6px; text-align: center; border-bottom: 2px solid #c2d4e8; white-space: nowrap; }
+    td { padding: 8px 4px; text-align: center; border-bottom: 1px solid #dce6f0; background: white; }
+    td input[type="number"] { width: 60px; padding: 6px 4px; border: 1px solid #bfd3e8; border-radius: 30px; text-align: center; font-weight: 500; background: #f9fcff; }
+    td input[type="number"]:focus { border-color: #1f6b9e; outline: none; background: white; }
+    .result-area { background: #e8f2fa; border-radius: 28px; padding: 22px 28px; margin: 22px 0 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border: 1px solid #c7d9ed; }
+    .result-item { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    .result-item .label { font-weight: 500; color: #1a3c59; }
+    .result-item .value { font-weight: 700; font-size: 1.6rem; color: #003057; background: white; padding: 2px 24px; border-radius: 60px; letter-spacing: 0.5px; }
+    .result-item .unit { font-weight: 400; color: #1f4f72; margin-left: -6px; }
+    .note { margin: 12px 0 0 0; font-size: 0.9rem; color: #2f5577; background: #f2f8ff; padding: 8px 20px; border-radius: 40px; display: inline-block; border: 1px solid #cfe0f2; }
+    .footer-hint { color: #3f6485; font-size: 0.85rem; margin-top: 16px; text-align: right; border-top: 1px solid #dce8f0; padding-top: 14px; display: flex; justify-content: space-between; flex-wrap: wrap; }
+    .hidden-col-toggle { margin: 8px 0 12px 0; display: flex; justify-content: flex-end; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .hidden-col-toggle button { background: #dce8f4; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 500; color: #1f4b6e; cursor: pointer; transition: 0.15s; }
+    .hidden-col-toggle button:hover { background: #c0d5ea; }
+    .hidden-col-toggle input { padding: 6px 14px; border-radius: 40px; border: 1px solid #bccddc; width: 140px; }
+    .hidden-col-toggle .hint { font-size: 0.8rem; color: #3f6485; }
+    .hidden-col { display: none; }
+    .print-btn, .reset-btn { border: none; padding: 8px 22px; border-radius: 60px; font-weight: 600; cursor: pointer; transition: 0.15s; margin-left: 8px; }
+    .print-btn { background: #1f4b6e; color: white; }
+    .print-btn:hover { background: #0f3755; box-shadow: 0 4px 10px rgba(0,20,40,0.2); }
+    .reset-btn { background: #c0392b; color: white; }
+    .reset-btn:hover { background: #a93226; }
+    .action-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    @media (max-width: 780px) {
+      .grid-2col { grid-template-columns: 1fr; gap: 12px; }
+      .result-area { flex-direction: column; align-items: stretch; gap: 14px; }
+      .result-item .value { font-size: 1.4rem; padding: 2px 16px; }
+      .panel-preview { margin-left: 0; width: 100%; justify-content: center; }
+      .project-header { flex-direction: column; align-items: stretch; gap: 10px; }
+      .project-header input { width: 100%; }
+    }
+    @media print {
+      body { background: white; margin: 0; }
+      .calculator { box-shadow: none; border-radius: 0; padding: 16px; }
+      .lang-bar, .hidden-col-toggle, .print-btn, .reset-btn, .no-print { display: none !important; }
+      /* 打印时强制隐藏所有 hidden-col */
+      .hidden-col { display: none !important; }
+      .project-header { background: #f0f4f8; border: 1px solid #aaa; }
+      .panel-selector { background: #f7faff; border: 1px solid #aaa; }
+      .result-area { background: #e8f2fa; border: 1px solid #aaa; }
+      .device-table { border: 1px solid #aaa; }
+      th { background: #d9e4f0 !important; }
+      .note { background: #f2f8ff; }
+    }
+  </style>
+</head>
+<body>
+<div class="calculator" id="app">
+  <!-- 项目信息 -->
+  <div class="project-header">
+    <div class="project-item"><span data-i18n="projectName">📋 项目名称</span><input type="text" id="projectNameInput" placeholder="例如：大厦消防工程" value=""></div>
+    <div class="project-item"><span data-i18n="date">📅 日期</span><input type="date" id="projectDateInput" value=""></div>
+    <div class="action-bar no-print">
+      <button class="print-btn" onclick="window.print()" data-i18n="printBtn">🖨️ 打印报表</button>
+      <button class="reset-btn" id="resetBtn" data-i18n="resetBtn">🔄 复位</button>
+    </div>
+  </div>
+
+  <div class="h1-title">
+    <span data-i18n="title">🔋 电池容量计算器</span>
+    <span class="lang-bar no-print">
+      <button class="lang-btn active" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">English</button>
+      <button class="lang-btn" data-lang="pt">Português</button>
+      <button class="lang-btn" data-lang="ru">Русский</button>
+      <button class="lang-btn" data-lang="tr">Türkçe</button>
+      <button class="lang-btn" data-lang="ar">العربية</button>
+    </span>
+  </div>
+
+  <!-- 面板 -->
+  <div class="panel-selector">
+    <label><span data-i18n="panelModel">📟 面板型号</span><select id="panelSelect"><option value="SEC1000">SEC1000</option><option value="SEC3002">SEC3002</option><option value="SEC3004">SEC3004</option><option value="SEC3008" selected>SEC3008</option></select></label>
+    <span style="color:#1f4b6e;" data-i18n="quiescentLabel">静态电流 (A):</span>
+    <strong id="quiescentDisplay" style="background:white; padding:4px 18px; border-radius:30px;">0.30</strong>
+    <div class="panel-preview" id="panelPreview"><img id="panelImage" src="" alt="面板图片" style="display:none;"><span id="panelNameLabel">SEC3008</span></div>
+  </div>
+
+  <!-- 时间 -->
+  <div class="grid-2col">
+    <div class="input-group"><label data-i18n="standbyTime">⏱️ 待机时间 (h)</label><input type="number" id="standbyHours" value="8" min="0" step="0.5"></div>
+    <div class="input-group"><label data-i18n="alarmTime">🚨 报警时间 (h)</label><input type="number" id="alarmHours" value="0.5" min="0" step="0.1"></div>
+  </div>
+
+  <!-- 设备表 -->
+  <div style="margin-top: 10px; font-weight: 500; color: #0b3755; display: flex; justify-content: space-between; flex-wrap: wrap;">
+    <span data-i18n="deviceConfig">⚙️ 系统设备配置</span>
+    <span class="hidden-col-toggle no-print">
+      <span class="hint" data-i18n="hideHint">🔒 隐藏列 (密码查看)</span>
+      <input type="password" id="hiddenPwd" placeholder="****" style="width:100px;">
+      <button id="toggleHiddenBtn" data-i18n="showBtn">显示</button>
+    </span>
+  </div>
+  <div class="device-table">
+    <table id="deviceTable">
+      <thead><tr>
+        <th data-i18n="model">型号</th><th data-i18n="qty">产品数量</th><th data-i18n="activeQty">报警激活数</th>
+        <th class="hidden-col" data-i18n="loopQc">回路静态 (A)</th>
+        <th class="hidden-col" data-i18n="sumLoopQc">Σ 回路静态</th>
+        <th class="hidden-col" data-i18n="loopAc">回路报警 (A)</th>
+        <th class="hidden-col" data-i18n="sumLoopAc">Σ 回路报警</th>
+        <th class="hidden-col" data-i18n="modQc">模块/声光静态 (A)</th>
+        <th class="hidden-col" data-i18n="sumModQc">Σ 24V静态</th>
+        <th class="hidden-col" data-i18n="modAc">24V报警 (A)</th>
+        <th class="hidden-col" data-i18n="sumModAc">Σ 24V报警</th>
+      </tr></thead>
+      <tbody id="deviceBody"></tbody>
+    </table>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-area">
+    <div class="result-item"><span class="label" data-i18n="batteryCapacity">🔋 电池容量 (24V)</span><span class="value" id="batteryAh">0.0</span><span class="unit">Ah</span></div>
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+      <div><span data-i18n="totalQuiescent">待机总电流</span> <strong id="totalQuiescentCurrent">0.000</strong> A</div>
+      <div><span data-i18n="totalAlarm">报警总电流</span> <strong id="totalAlarmCurrent">0.000</strong> A</div>
+    </div>
+  </div>
+
+  <div class="note" data-i18n="noteGreen">📝 请在表格中填写实际工程产品数量 / 报警激活数</div>
+  <div class="footer-hint">
+    <span data-i18n="footer">基于 SANJIAN Standby battery calculator V1.3 · 实时计算</span>
+    <span class="no-print" style="font-size:0.8rem; color:#5f7f9f;">🖨️ 打印时隐藏参数列</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  // ----- 设备库 -----
+  const DEVICES = [
+    { model: "A9020T", loopQ: 0.0002, loopA: 0.001,  modQ: 0,     modA: 0 },
+    { model: "A9029T", loopQ: 0.0003, loopA: 0.0015, modQ: 0,     modA: 0 },
+    { model: "A9030T", loopQ: 0.0002, loopA: 0.001,  modQ: 0,     modA: 0 },
+    { model: "A9036T", loopQ: 0.0003, loopA: 0.0011, modQ: 0,     modA: 0 },
+    { model: "A9052T", loopQ: 0.0004, loopA: 0.0012, modQ: 0.012, modA: 0.024 },
+    { model: "A9054T", loopQ: 0.003,  loopA: 0.006,  modQ: 0,     modA: 0 },
+    { model: "A9056T", loopQ: 0.0003, loopA: 0.003,  modQ: 0.001, modA: 0.01 },
+    { model: "A9057T", loopQ: 0.003,  loopA: 0,      modQ: 0,     modA: 0 },
+    { model: "A9058T", loopQ: 0.0005, loopA: 0.0015, modQ: 0,     modA: 0 },
+    { model: "A9060T", loopQ: 0.0002, loopA: 0.001,  modQ: 0,     modA: 0 },
+    { model: "A9073T", loopQ: 0.0005, loopA: 0.002,  modQ: 0,     modA: 0 },
+    { model: "A9091T", loopQ: 0.002,  loopA: 0.003,  modQ: 0.003, modA: 0.09 },
+    { model: "A9092T", loopQ: 0.001,  loopA: 0.005,  modQ: 0,     modA: 0 },
+    { model: "A9093G", loopQ: 0.0008, loopA: 0.012,  modQ: 0,     modA: 0 },
+    { model: "A9093T", loopQ: 0.0008, loopA: 0.012,  modQ: 0,     modA: 0 },
+    { model: "A9097B", loopQ: 0.001,  loopA: 0.005,  modQ: 0,     modA: 0 },
+    { model: "A9154T", loopQ: 0.0008, loopA: 0.0008, modQ: 0.03,  modA: 0.4 }
+  ];
+
+  const PANEL_IMAGES = {
+    SEC1000: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50"><rect width="100" height="50" fill="%23d9e6f2" rx="6"/><text x="50" y="30" font-family="sans-serif" font-size="14" fill="%231f4b6e" text-anchor="middle">SEC1000</text></svg>',
+    SEC3002: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50"><rect width="100" height="50" fill="%23c2d9e8" rx="6"/><text x="50" y="30" font-family="sans-serif" font-size="14" fill="%231f4b6e" text-anchor="middle">SEC3002</text></svg>',
+    SEC3004: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50"><rect width="100" height="50" fill="%23b0cce0" rx="6"/><text x="50" y="30" font-family="sans-serif" font-size="14" fill="%231f4b6e" text-anchor="middle">SEC3004</text></svg>',
+    SEC3008: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50"><rect width="100" height="50" fill="%2399bbd4" rx="6"/><text x="50" y="30" font-family="sans-serif" font-size="14" fill="%23ffffff" text-anchor="middle">SEC3008</text></svg>'
+  };
+
+  // ----- DOM -----
+  const panelSelect = document.getElementById('panelSelect');
+  const quiescentDisplay = document.getElementById('quiescentDisplay');
+  const standbyInput = document.getElementById('standbyHours');
+  const alarmInput = document.getElementById('alarmHours');
+  const tbody = document.getElementById('deviceBody');
+  const batteryAh = document.getElementById('batteryAh');
+  const totalQuiescentCurrent = document.getElementById('totalQuiescentCurrent');
+  const totalAlarmCurrent = document.getElementById('totalAlarmCurrent');
+  const panelImage = document.getElementById('panelImage');
+  const panelNameLabel = document.getElementById('panelNameLabel');
+  const projectNameInput = document.getElementById('projectNameInput');
+  const projectDateInput = document.getElementById('projectDateInput');
+  const hiddenPwdInput = document.getElementById('hiddenPwd');
+  const toggleHiddenBtn = document.getElementById('toggleHiddenBtn');
+
+  let qtyInputs = [], activeInputs = [];
+  let hiddenVisible = false;
+  // 固定密码 (用于查看隐藏列)
+  const VIEW_PASSWORD = '1234';
+
+  const PANEL_MAP = { SEC1000: { quiescent: 0.15 }, SEC3002: { quiescent: 0.25 }, SEC3004: { quiescent: 0.30 }, SEC3008: { quiescent: 0.30 } };
+
+  // 日期默认
+  projectDateInput.value = new Date().toISOString().split('T')[0];
+
+  function updatePanelImage(panelModel) {
+    const imgSrc = PANEL_IMAGES[panelModel] || '';
+    if (imgSrc) { panelImage.src = imgSrc; panelImage.style.display = 'inline-block'; } 
+    else { panelImage.style.display = 'none'; }
+    panelNameLabel.textContent = panelModel;
+  }
+
+  // ----- 渲染表格 -----
+  function renderTable() {
+    tbody.innerHTML = '';
+    qtyInputs = []; activeInputs = [];
+    DEVICES.forEach((dev, idx) => {
+      const tr = document.createElement('tr');
+      const modelTd = document.createElement('td'); modelTd.textContent = dev.model; tr.appendChild(modelTd);
+      const qtyTd = document.createElement('td');
+      const qtyInput = document.createElement('input'); qtyInput.type = 'number'; qtyInput.min = 0; qtyInput.step = 1; qtyInput.value = 0; qtyInput.dataset.idx = idx; qtyInput.className = 'qty-input';
+      qtyTd.appendChild(qtyInput); tr.appendChild(qtyTd); qtyInputs.push(qtyInput);
+      const activeTd = document.createElement('td');
+      const activeInput = document.createElement('input'); activeInput.type = 'number'; activeInput.min = 0; activeInput.step = 1; activeInput.value = 0; activeInput.dataset.idx = idx; activeInput.className = 'active-input';
+      activeTd.appendChild(activeInput); tr.appendChild(activeTd); activeInputs.push(activeInput);
+      // 隐藏列
+      [dev.loopQ, dev.loopA, dev.modQ, dev.modA].forEach(v => { const td = document.createElement('td'); td.textContent = v.toFixed(4); td.className = 'hidden-col'; tr.appendChild(td); });
+      ['sumLoopQ','sumLoopA','sumModQ','sumModA'].forEach(id => { const td = document.createElement('td'); td.id = id+'_'+idx; td.textContent = '0.0000'; td.className = 'hidden-col'; tr.appendChild(td); });
+      tbody.appendChild(tr);
+    });
+    document.querySelectorAll('.qty-input, .active-input').forEach(el => {
+      el.addEventListener('input', function() {
+        const idx = parseInt(this.dataset.idx);
+        if (this.classList.contains('active-input')) {
+          const qty = parseFloat(qtyInputs[idx].value) || 0;
+          if (parseFloat(this.value) > qty) this.value = qty;
+        }
+        computeAll();
+      });
+      el.addEventListener('blur', function() {
+        const idx = parseInt(this.dataset.idx);
+        if (this.classList.contains('active-input')) {
+          const qty = parseFloat(qtyInputs[idx].value) || 0;
+          if (parseFloat(this.value) > qty) this.value = qty;
+        }
+        computeAll();
+      });
+    });
+  }
+
+  // ----- 计算 -----
+  function computeAll() {
+    const panel = panelSelect.value;
+    const panelQuiescent = PANEL_MAP[panel]?.quiescent || 0.30;
+    quiescentDisplay.textContent = panelQuiescent.toFixed(2);
+    updatePanelImage(panel);
+    const qtyVals = qtyInputs.map(inp => parseFloat(inp.value) || 0);
+    const activeVals = activeInputs.map(inp => parseFloat(inp.value) || 0);
+    let totalLoopQ = 0, totalLoopA = 0, totalModQ = 0, totalModA = 0;
+    DEVICES.forEach((dev, idx) => {
+      const qty = qtyVals[idx] || 0, active = activeVals[idx] || 0;
+      const sumLQ = qty * dev.loopQ, sumLA = active * dev.loopA, sumMQ = qty * dev.modQ, sumMA = active * dev.modA;
+      document.getElementById('sumLoopQ_'+idx).textContent = sumLQ.toFixed(4);
+      document.getElementById('sumLoopA_'+idx).textContent = sumLA.toFixed(4);
+      document.getElementById('sumModQ_'+idx).textContent = sumMQ.toFixed(4);
+      document.getElementById('sumModA_'+idx).textContent = sumMA.toFixed(4);
+      totalLoopQ += sumLQ; totalLoopA += sumLA; totalModQ += sumMQ; totalModA += sumMA;
+    });
+    const totalQuiescent = totalLoopQ + panelQuiescent + totalModQ;
+    const totalAlarm = totalLoopA + totalModA;
+    totalQuiescentCurrent.textContent = totalQuiescent.toFixed(4);
+    totalAlarmCurrent.textContent = totalAlarm.toFixed(4);
+    const standbyH = parseFloat(standbyInput.value) || 0, alarmH = parseFloat(alarmInput.value) || 0;
+    const rawAh = (standbyH * totalQuiescent) + (alarmH * totalAlarm);
+    batteryAh.textContent = (Math.ceil(1.25 * rawAh * 10) / 10).toFixed(1);
+  }
+
+  // ----- 隐藏列切换 (固定密码) -----
+  function toggleHiddenColumns(show) {
+    hiddenVisible = show;
+    document.querySelectorAll('.hidden-col').forEach(el => el.style.display = show ? '' : 'none');
+    toggleHiddenBtn.textContent = show ? '隐藏' : '显示';
+  }
+
+  // ----- 复位功能 (清数量 + 恢复时间默认) -----
+  function resetAll() {
+    if (confirm('复位后，所有数据清理！是否继续？')) {
+      qtyInputs.forEach(inp => inp.value = 0);
+      activeInputs.forEach(inp => inp.value = 0);
+      standbyInput.value = 8;
+      alarmInput.value = 0.5;
+      computeAll();
+    }
+  }
+
+  // ----- i18n -----
+  const i18n = {
+    zh: { title: '🔋 电池容量计算器', panelModel: '📟 面板型号', quiescentLabel: '静态电流 (A):', standbyTime: '⏱️ 待机时间 (h)', alarmTime: '🚨 报警时间 (h)', deviceConfig: '⚙️ 系统设备配置', model: '型号', qty: '产品数量', activeQty: '报警激活数', loopQc: '回路静态 (A)', sumLoopQc: 'Σ 回路静态', loopAc: '回路报警 (A)', sumLoopAc: 'Σ 回路报警', modQc: '模块/声光静态 (A)', sumModQc: 'Σ 24V静态', modAc: '24V报警 (A)', sumModAc: 'Σ 24V报警', batteryCapacity: '🔋 电池容量 (24V)', totalQuiescent: '待机总电流', totalAlarm: '报警总电流', noteGreen: '📝 请在表格中填写实际工程产品数量 / 报警激活数', footer: '基于 SANJIAN Standby battery calculator V1.3 · 实时计算', hideHint: '🔒 隐藏列 (密码查看)', showBtn: '显示', projectName: '📋 项目名称', date: '📅 日期', printBtn: '🖨️ 打印报表', resetBtn: '🔄 复位' },
+    en: { title: '🔋 Battery Capacity Calculator', panelModel: '📟 Panel Model', quiescentLabel: 'Quiescent (A):', standbyTime: '⏱️ Standby (h)', alarmTime: '🚨 Alarm (h)', deviceConfig: '⚙️ System Device Config', model: 'Model', qty: 'Qty', activeQty: 'Active Qty', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarm (A)', sumLoopAc: 'Σ Loop Alarm', modQc: 'Mod/Sounder Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Battery Cap. (24V)', totalQuiescent: 'Total Q', totalAlarm: 'Total Alarm', noteGreen: '📝 Fill actual project Qty / Active', footer: 'Based on SANJIAN Standby battery calculator V1.3 · Real-time', hideHint: '🔒 Hidden cols (pwd view)', showBtn: 'Show', projectName: '📋 Project Name', date: '📅 Date', printBtn: '🖨️ Print Report', resetBtn: '🔄 Reset' },
+    pt: { title: '🔋 Calculadora de Bateria', panelModel: '📟 Modelo do Painel', quiescentLabel: 'Corrente quiescente (A):', standbyTime: '⏱️ Espera (h)', alarmTime: '🚨 Alarme (h)', deviceConfig: '⚙️ Config. Dispositivos', model: 'Modelo', qty: 'Qtd', activeQty: 'Ativados', loopQc: 'Loop Q (A)', sumLoopQc: 'Σ Loop Q', loopAc: 'Loop Alarme (A)', sumLoopAc: 'Σ Loop Alarme', modQc: 'Mód/Son Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarme (A)', sumModAc: 'Σ 24V Alarme', batteryCapacity: '🔋 Capacidade (24V)', totalQuiescent: 'Q total', totalAlarm: 'Alarme total', noteGreen: '📝 Preencha Qtd / Ativados reais', footer: 'Baseado em SANJIAN Standby battery calculator V1.3 · Tempo real', hideHint: '🔒 Colunas ocultas (senha)', showBtn: 'Mostrar', projectName: '📋 Nome do Projeto', date: '📅 Data', printBtn: '🖨️ Imprimir', resetBtn: '🔄 Redefinir' },
+    ru: { title: '🔋 Калькулятор батареи', panelModel: '📟 Модель панели', quiescentLabel: 'Ток покоя (A):', standbyTime: '⏱️ Резерв (ч)', alarmTime: '🚨 Тревога (ч)', deviceConfig: '⚙️ Конфигурация устройств', model: 'Модель', qty: 'Кол-во', activeQty: 'Актив. тревога', loopQc: 'Петля Q (A)', sumLoopQc: 'Σ Петля Q', loopAc: 'Петля тревога (A)', sumLoopAc: 'Σ Петля тревога', modQc: 'Мод/звук Q (A)', sumModQc: 'Σ 24В Q', modAc: '24В тревога (A)', sumModAc: 'Σ 24В тревога', batteryCapacity: '🔋 Ёмкость (24В)', totalQuiescent: 'Общий ток покоя', totalAlarm: 'Общий ток тревоги', noteGreen: '📝 Заполните фактические значения (Кол-во / Актив.)', footer: 'На основе SANJIAN Standby battery calculator V1.3 · реальное время', hideHint: '🔒 Скрытые колонки (пароль)', showBtn: 'Показать', projectName: '📋 Название проекта', date: '📅 Дата', printBtn: '🖨️ Печать', resetBtn: '🔄 Сброс' },
+    tr: { title: '🔋 Batarya Kapasite Hesaplayıcı', panelModel: '📟 Panel Modeli', quiescentLabel: 'Sakin akım (A):', standbyTime: '⏱️ Bekleme (s)', alarmTime: '🚨 Alarm (s)', deviceConfig: '⚙️ Sistem Cihazları', model: 'Model', qty: 'Adet', activeQty: 'Aktif Alarm', loopQc: 'Döngü Q (A)', sumLoopQc: 'Σ Döngü Q', loopAc: 'Döngü Alarm (A)', sumLoopAc: 'Σ Döngü Alarm', modQc: 'Mod/Ses Q (A)', sumModQc: 'Σ 24V Q', modAc: '24V Alarm (A)', sumModAc: 'Σ 24V Alarm', batteryCapacity: '🔋 Kapasite (24V)', totalQuiescent: 'Toplam Sakin', totalAlarm: 'Toplam Alarm', noteGreen: '📝 Gerçek değerleri girin (Adet / Aktif)', footer: 'SANJIAN Standby battery calculator V1.3 · Gerçek zamanlı', hideHint: '🔒 Gizli sütunlar (şifre)', showBtn: 'Göster', projectName: '📋 Proje Adı', date: '📅 Tarih', printBtn: '🖨️ Yazdır', resetBtn: '🔄 Sıfırla' },
+    ar: { title: '🔋 حاسبة سعة البطارية', panelModel: '📟 طراز اللوحة', quiescentLabel: 'تيار السكون (أ):', standbyTime: '⏱️ وقت الاستعداد (س)', alarmTime: '🚨 وقت الإنذار (س)', deviceConfig: '⚙️ تكوين الأجهزة', model: 'الطراز', qty: 'الكمية', activeQty: 'عدد الإنذار', loopQc: 'تيار الحلقة (أ)', sumLoopQc: 'Σ تيار الحلقة', loopAc: 'إنذار الحلقة (أ)', sumLoopAc: 'Σ إنذار الحلقة', modQc: 'تيار الوحدة (أ)', sumModQc: 'Σ 24V تيار', modAc: 'إنذار 24V (أ)', sumModAc: 'Σ إنذار 24V', batteryCapacity: '🔋 السعة (24 فولت)', totalQuiescent: 'إجمالي السكون', totalAlarm: 'إجمالي الإنذار', noteGreen: '📝 أدخل القيم الفعلية (الكمية / النشط)', footer: 'استنادًا إلى SANJIAN Standby battery calculator V1.3 · فوري', hideHint: '🔒 أعمدة مخفية (كلمة مرور)', showBtn: 'عرض', projectName: '📋 اسم المشروع', date: '📅 التاريخ', printBtn: '🖨️ طباعة', resetBtn: '🔄 إعادة تعيين' }
+  };
+
+  let currentLang = 'zh';
+  function applyLanguage(lang) {
+    currentLang = lang;
+    const dict = i18n[lang] || i18n.zh;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (dict[key]) el.textContent = dict[key];
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+  }
+
+  // ----- 事件绑定 -----
+  panelSelect.addEventListener('change', computeAll);
+  standbyInput.addEventListener('input', computeAll);
+  alarmInput.addEventListener('input', computeAll);
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', function() { applyLanguage(this.dataset.lang); }));
+
+  // 隐藏列按钮 - 固定密码验证
+  toggleHiddenBtn.addEventListener('click', function() {
+    if (hiddenVisible) {
+      toggleHiddenColumns(false);
+      hiddenPwdInput.value = '';
+      return;
+    }
+    const pwd = hiddenPwdInput.value;
+    if (pwd === VIEW_PASSWORD) {
+      toggleHiddenColumns(true);
+      hiddenPwdInput.value = '';
+    } else {
+      alert('密码错误！');
+      hiddenPwdInput.value = '';
+    }
+  });
+
+  // 复位
+  document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+  // 初始化
+  toggleHiddenColumns(false);
+  renderTable();
+  applyLanguage('zh');
+  computeAll();
+  window.recompute = computeAll;
+})();
+</script>
+</body>
+</html>
